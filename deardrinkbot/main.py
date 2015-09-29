@@ -2,12 +2,23 @@
 
 from bottle import request, route, run
 import os
+import random
 import telegram
 
 
 REPLIES = {
-    u'привет': u'Привет!',
-    u'пока': u'До встречи. :)',
+    u'привет': [
+        u'Привет!',
+        u'Здравствуй!',
+        u'Рада тебя слышать. :)',
+        u'О! Кого я вижу :) Как у тебя дела?',
+    ],
+    u'пока': [
+        u'До встречи. :)',
+        u'Ты пиши, если что. :)',
+        u'Успехов! :)',
+        u'Всегда приятно тебя читать. :)',
+    ],
 }
 
 
@@ -30,10 +41,15 @@ def webhook_handler():
             update.message.text.encode('utf-8'),
             message.encode('utf-8'),
         )
+
+        reply = REPLIES.get(message, 'Дорогая, выпей вина! ' + telegram.Emoji.WINE_GLASS)
+        if isinstance(reply, list):
+            reply = random.choice(reply)
+
         bot.sendChatAction(chat_id=chat_id, action=telegram.ChatAction.TYPING)
         bot.sendMessage(
             chat_id=chat_id,
-            text=REPLIES.get(message, 'Дорогая, выпей вина! ' + telegram.Emoji.WINE_GLASS),
+            text=reply,
         )
 
     return 'ok'
