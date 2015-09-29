@@ -19,10 +19,15 @@ if __name__ == '__main__':
             message = update.message.text.strip('!., ').lower()
 
             if message:
-                print chat_id, message
+                print u'(%d) [%s] %s {{ %s }}' % (
+                    chat_id,
+                    update.message.from_user.name,
+                    update.message.text,
+                    message,
+                )
                 bot.sendChatAction(chat_id=chat_id, action=telegram.ChatAction.TYPING)
                 bot.sendMessage(
                     chat_id=chat_id,
-                    text=REPLIES.get(message, u'Дорогая, выпей вина!'),
+                    text=REPLIES.get(message, 'Дорогая, выпей вина! ' + telegram.Emoji.WINE_GLASS),
                 )
                 last_update_id = update.update_id + 1
