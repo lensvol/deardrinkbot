@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from bottle import request, route, run
+from fuzzywuzzy import process
 import os
 import re
 import random
@@ -31,10 +32,16 @@ def replace_emoji_code(m):
 
 def find_reply(message_text, replies_dict):
     message = message_text.strip('!., ').lower()
-    reply = replies_dict.get(
-        unicode(message_text),
-        u'Дорогая, выпей вина! :wine_glass:',
-    )
+    distance = process.extract(message, replies_dict.keys(), limit=1)[0]
+
+    if distance[1] < 75:
+        reply = u'Дорогая, выпей вина! :wine_glass:'
+    else:
+        reply = replies_dict.get(
+            distance[0],
+            u'Дорогая, выпей вина! :wine_glass:',
+        )
+
     if isinstance(reply, list):
         reply = random.choice(reply)
     return re.sub(':([a-z_]+):', replace_emoji_code, reply.encode('utf-8'))
